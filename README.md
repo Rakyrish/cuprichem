@@ -87,17 +87,39 @@ facility. Real or generated photography can be layered into `HeroBackdrop` /
 ## Deployment
 
 ```bash
-# Production stack: Next standalone app behind Caddy (auto-HTTPS + headers)
-SITE_ADDRESS=cuprichem.co.ke \
-NEXT_PUBLIC_SITE_URL=https://cuprichem.co.ke \
+cp .env.example .env      # fill in, then:
 docker compose up -d --build
 ```
 
 The multi-stage `Dockerfile` builds the `output: "standalone"` bundle and runs
-it as a non-root user. `NEXT_PUBLIC_*` values are inlined at build time — pass
-the real origin as a build arg (compose does this).
+it as a non-root user. The browser-visible values are inlined at build time, so
+the build needs the real `.env`; compose mounts it as a BuildKit **secret**, and
+it therefore never lands in an image layer. Compose also passes it to both
+containers via `env_file`, so `Caddyfile` gets `SITE_ADDRESS`, `WEB_PORT` and
+`MEDIA_CDN_ORIGIN` from the same file the apps use.
 
 ## Configuration
 
-Copy `.env.example` → `.env.local`. `NEXT_PUBLIC_SITE_URL` must be the real
-production origin — it drives canonical URLs, the sitemap and OG URLs.
+There is **one** environment file for the whole repository: `.env` at the root.
+The public site, the admin console (`admin/`) and the Django API (`backend/`)
+all read it — none of them has an `.env` of its own. Copy `.env.example` → `.env`
+and fill it in.
+
+| Consumer | How it loads the root `.env` |
+| --- | --- |
+| Public site | `next.config.ts` calls `loadEnvConfig()` and inlines the browser-visible keys via `env` |
+| Admin | `admin/next.config.ts` does the same, resolving one directory up |
+| Backend | `backend/config/settings/base.py` calls `load_dotenv(REPO_ROOT / ".env")` |
+
+Nothing company-, brand- or origin-specific is written in source: company facts
+come from `COMPANY_*`, identity from `SITE_*`, assets and runtime colours from
+`BRAND_*`, and origins/ports from `SITE_URL`, `API_BASE_URL`, `ADMIN_ORIGIN`,
+`WEB_PORT` and `ADMIN_PORT`. `SITE_URL` must be the real production origin — it
+drives canonical URLs, the sitemap, OG URLs and the backend's revalidation
+hooks. Both Next apps and Django **fail to start** naming any missing variable,
+rather than rendering a blank field.
+
+Only the keys listed in each `next.config.ts` `BROWSER_ENV_KEYS` array reach the
+browser. Credentials (`OPENAI_API_KEY`, `CLOUDINARY_*`, `POSTGRES_PASSWORD`,
+`DJANGO_SECRET_KEY`) are deliberately absent from those lists and are read only
+by the backend.

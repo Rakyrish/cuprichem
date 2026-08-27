@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+/*
+  Cuprichem control centre — design tokens.
+
+  Same brand DNA as the public site (the palette is sampled from the logo
+  artwork: green #8dc63f, blue #1b75bc) but a different REGISTER. The public
+  site is photographic and spacious to persuade; this is dense, ruled and
+  monospaced where it carries data, because the job here is reading numbers and
+  making decisions quickly.
+
+  Colour discipline:
+    blue  — structure. Navigation, headers, chrome, structural rules.
+    lime  — action and affirmation ONLY. Active nav item, primary action,
+            successful operation, AI controls, healthy status. Never decorative;
+            if lime appears everywhere it stops meaning anything.
+    amber — needs attention.  red — critical/destructive.
+*/
+
+@theme {
+  /* Brand, from the logo. Contrast ratios noted where a value carries text. */
+  --color-lime: #8dc63f; /* the logo swoosh — 7.35:1 with ink */
+  --color-lime-dim: #7db332;
+  --color-lime-deep: #4e7f1d; /* white on it 4.80:1 */
+  --color-lime-tint: #eef6e2;
+
+  --color-blue: #1b75bc; /* the logo wordmark — white on it 4.86:1 */
+  --color-blue-ink: #155e97; /* blue text on paper 6.53:1 */
+  --color-blue-tint: #e9f2fa;
+  --color-blue-bright: #6bb0e4; /* on dark surfaces */
+
+  /* Navy chrome — the sidebar and top bar. */
+  --color-navy: #0b3f68;
+  --color-navy-deep: #092a44;
+  --color-navy-darkest: #072034;
+  --color-navy-line: #16496f;
+
+  /* Surfaces */
+  --color-ink: #0e2033;
+  --color-muted: #566473;
+  --color-faint: #8b98a6;
+  --color-paper: #ffffff;
+  --color-canvas: #f4f7fa; /* app background behind cards */
+  --color-surface: #eef3f7;
+  --color-line: #dde5ec;
+  --color-line-strong: #c3cdd8;
+  --color-on-dark: #eef3f8;
+  --color-muted-on-dark: #a7b6c6;
+
+  /* Status */
+  --color-ok: #2f7d32;
+  --color-ok-tint: #e8f4e9;
+  --color-warn: #a8631a;
+  --color-warn-tint: #fbf1e3;
+  --color-danger: #b3261e;
+  /* Google's own SERP colours, reproduced so the search preview looks like a
+     real result. Not part of the admin palette — do not reuse them elsewhere. */
+  --color-serp-title: #1a0dab;
+  --color-serp-text: #4d5156;
+  --color-danger-tint: #fbeae9;
+
+  /* Type */
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Radii — small. This is an instrument panel, not a marketing page. */
+  --radius-sm: 3px;
+  --radius: 5px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+
+  --sidebar-w: 15rem;
+  --topbar-h: 3.5rem;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Tabular figures everywhere numbers are compared down a column. */
+  .tabular,
+  table td,
+  table th {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Monospace metadata label — the signature detail shared with the public site. */
+  .u-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .u-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+
+  /* Field-level inputs. Kept as a component class because there are dozens of
+     them and they must stay visually identical across every form. */
+  .u-input {
+    width: 100%;
+    background: var(--color-paper);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.7rem;
+    font-size: 0.9rem;
+    color: var(--color-ink);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .u-input:focus {
+    outline: none;
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 3px rgba(27, 117, 188, 0.15);
+  }
+  .u-input::placeholder {
+    color: var(--color-faint);
+  }
+  .u-input:disabled {
+    background: var(--color-surface);
+    color: var(--color-muted);
+  }
+
+  .u-mono-input {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+
+  /* Loading shimmer for skeleton rows. */
+  .u-skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface) 25%,
+      #e3eaf1 37%,
+      var(--color-surface) 63%
+    );
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+    border-radius: var(--radius-sm);
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  }
+
+  /* Thin scrollbars inside dense panels. */
+  .u-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}

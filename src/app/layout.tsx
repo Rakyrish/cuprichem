@@ -5,6 +5,7 @@ import { siteConfig } from "@/config/site";
 import { organizationLd, websiteLd } from "@/lib/seo";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { FloatingContact } from "@/components/layout/FloatingContact";
 import { JsonLd } from "@/components/ui/JsonLd";
 
 // Display / headings — geometric technical grotesk (distinct identity).
@@ -48,7 +49,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0e2033",
+  // Matches the solid header bar, so mobile browser chrome blends into it.
+  themeColor: siteConfig.brand.colors.header,
   width: "device-width",
   initialScale: 1,
 };
@@ -71,6 +73,7 @@ export default function RootLayout({
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        <FloatingContact />
       </body>
     </html>
   );

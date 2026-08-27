@@ -1,111 +1,181 @@
-import Link from "next/link";
+"use client";
+
+import { siteConfig } from "@/config/site";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
+import { photos } from "@/config/images";
 
 /**
- * Home hero — deliberately NOT a giant photo. An asymmetric split: a strong
- * editorial statement on the left, and a "catalogue index" ledger panel on the
- * right that doubles as primary navigation into the information architecture.
- * The index lists site sections (navigation), not fabricated product claims.
+ * Home hero — full-bleed photographic stage with a rotating set of statements
+ * laid over it, in the manner of a modern ingredient-supplier site.
+ *
+ * Structure: stacked full-cover photos that cross-fade, a fixed contrast scrim,
+ * and centred copy anchored toward the lower third. The header sits transparent
+ * on top of this, so the section is pulled up under it by `--header-h`.
+ *
+ * Every claim in `slides` is neutral and verifiable — capability and category
+ * statements only, no invented figures, certifications or client names.
  */
-const indexRows = [
-  { code: "PRD", label: "Products", href: "/products", note: "Catalogue in build-out" },
-  { code: "CAT", label: "Categories", href: "/categories", note: "By chemical type" },
-  { code: "IND", label: "Industries", href: "/industries", note: "By sector served" },
-  { code: "RES", label: "Resources", href: "/resources", note: "Guides & technical notes" },
+
+const slides = [
+  {
+    eyebrow: `Industrial chemical supply · ${siteConfig.company.address.region}, ${siteConfig.company.address.country}`,
+    title: "The chemistry your process depends on.",
+    body: `${siteConfig.legalName} supplies manufacturers, institutions and laboratories across ${siteConfig.company.address.country} — specified to the right grade, sourced through a direct quote.`,
+    photo: photos.drumStoreWide,
+    cta: { label: "Request a quote", href: "/request-a-quote" },
+    secondary: { label: "Browse the catalogue", href: "/products" },
+  },
+  {
+    eyebrow: "Bulk and packed supply",
+    title: "From bulk storage to the drum at your door.",
+    body: "Drums, IBCs, jerrycans and packed goods — the grade and packaging confirmed per enquiry, with documentation supplied where we hold it.",
+    photo: photos.drumsStacked,
+    cta: { label: "How sourcing works", href: "/about" },
+    secondary: { label: "Talk to sales", href: "/contact" },
+  },
+  {
+    eyebrow: "Coatings and allied chemicals",
+    title: "Stock that keeps your line running.",
+    body: "Solvents, resins, pigments and allied chemistry for the coatings, construction and manufacturing sectors across the region.",
+    photo: photos.coatingsAisle,
+    cta: { label: "Explore categories", href: "/categories" },
+    secondary: { label: "Industries we serve", href: "/industries" },
+  },
 ];
 
+const ROTATE_MS = 7000;
+
 export function Hero() {
+  const [active, setActive] = useState(0);
+  // Autoplay stops for good once the visitor takes control, so a click is
+  // never fought by the timer.
+  const [userEngaged, setUserEngaged] = useState(false);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const select = useCallback((index: number) => {
+    setUserEngaged(true);
+    setActive(index);
+  }, []);
+
+  useEffect(() => {
+    if (userEngaged) return;
+    // Respect reduced-motion: no automatic slide changes at all.
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduced) return;
+
+    timer.current = setInterval(() => {
+      setActive((i) => (i + 1) % slides.length);
+    }, ROTATE_MS);
+    return () => {
+      if (timer.current) clearInterval(timer.current);
+    };
+  }, [userEngaged]);
+
+  const current = slides[active];
+
   return (
-    <section className="relative overflow-hidden border-b border-line">
-      <HeroBackdrop />
-      <div className="u-container relative grid gap-12 py-16 md:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
-        {/* Statement */}
-        <div className="flex flex-col justify-center">
-          <p className="hero-rise u-mono-label" style={{ "--d": "0ms" } as React.CSSProperties}>
-            Industrial chemical supply · Nairobi, Kenya
-          </p>
-          <h1
-            className="hero-rise mt-6 text-4xl leading-[1.03] sm:text-5xl lg:text-6xl"
-            style={{ "--d": "80ms" } as React.CSSProperties}
-          >
-            Source industrial chemicals with{" "}
-            <span className="text-brand-700">technical precision</span>.
-          </h1>
-          <p
-            className="hero-rise mt-6 max-w-xl text-lg leading-relaxed text-muted"
-            style={{ "--d": "160ms" } as React.CSSProperties}
-          >
-            Cuprichem Industrial Chemicals Ltd supplies manufacturers,
-            institutions and laboratories across Kenya. Discover the chemistry
-            you need, specify it to the right grade, and source it through a
-            direct, transparent quote.
-          </p>
-          <div
-            className="hero-rise mt-8 flex flex-wrap items-center gap-3"
-            style={{ "--d": "240ms" } as React.CSSProperties}
-          >
-            <Button href="/request-a-quote" size="lg">
-              Request a quote
-            </Button>
-            <Button href="/products" size="lg" variant="outline">
-              Browse the catalogue
-            </Button>
+    <section
+      aria-roledescription="carousel"
+      aria-label={`${siteConfig.name} introduction`}
+      // Height accounts for the opaque header above it (utility strip 2.25rem
+      // + bar 4.5rem) so the first screen still resolves to exactly one view.
+      className="relative isolate flex min-h-[34rem] flex-col justify-end overflow-hidden bg-ink-strong md:min-h-[42rem] lg:h-[calc(100svh-6.75rem)] lg:max-h-[52rem]"
+    >
+      {/* Photographic stage — all slides mounted, cross-faded. */}
+      {slides.map((slide, i) => (
+        <div
+          key={slide.photo.src}
+          aria-hidden={i !== active}
+          className="absolute inset-0 -z-10 transition-opacity duration-[1200ms] ease-out"
+          style={{ opacity: i === active ? 1 : 0 }}
+        >
+          <Image
+            src={slide.photo.src}
+            alt={i === active ? slide.photo.alt : ""}
+            fill
+            priority={i === 0}
+            sizes="100vw"
+            quality={92}
+            className={i === active ? "photo-drift object-cover" : "object-cover"}
+            style={{ objectPosition: slide.photo.position }}
+          />
+        </div>
+      ))}
+
+      {/* Contrast layers — above the photos, below the content. The flat scrim
+          holds the header and the bottom edge; the focus pool sits under the
+          copy so bright frames can't wash the type out. */}
+      <div aria-hidden className="u-photo-scrim absolute inset-0 -z-10" />
+      <div aria-hidden className="u-photo-focus absolute inset-0 -z-10" />
+
+      {/* Copy */}
+      <div
+        className="u-container relative w-full pb-16 pt-20 md:pb-24 md:pt-24"
+        aria-live="polite"
+      >
+        <div className="u-photo-text mx-auto max-w-3xl text-center">
+          {/* `key` restarts the entrance animation on every slide change. */}
+          <div key={active}>
+            <p
+              // Tighter and smaller on narrow screens — the eyebrows run long
+              // and wide tracking makes them wrap badly at phone widths.
+              className="hero-rise font-mono text-[0.6rem] uppercase tracking-[0.1em] text-brand-bright sm:text-[0.72rem] sm:tracking-[0.18em]"
+              style={{ "--d": "0ms" } as React.CSSProperties}
+            >
+              {current.eyebrow}
+            </p>
+            <h1
+              className="hero-rise mt-6 text-4xl text-white sm:text-5xl lg:text-[3.75rem]"
+              style={{ "--d": "90ms" } as React.CSSProperties}
+            >
+              {current.title}
+            </h1>
+            <p
+              className="hero-rise mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/95"
+              style={{ "--d": "180ms" } as React.CSSProperties}
+            >
+              {current.body}
+            </p>
+            <div
+              className="hero-rise mt-9 flex flex-wrap items-center justify-center gap-3"
+              style={{ "--d": "270ms" } as React.CSSProperties}
+            >
+              <Button href={current.cta.href} size="lg" variant="onPhotoSolid">
+                {current.cta.label}
+                <span aria-hidden>+</span>
+              </Button>
+              <Button href={current.secondary.href} size="lg" variant="onPhoto">
+                {current.secondary.label}
+              </Button>
+            </div>
           </div>
-          <p
-            className="hero-rise mt-6 font-mono text-[0.72rem] uppercase tracking-[0.12em] text-muted"
-            style={{ "--d": "320ms" } as React.CSSProperties}
-          >
-            Discover → Specify → Source
-          </p>
         </div>
 
-        {/* Catalogue index ledger */}
-        <div
-          className="hero-rise lg:pl-6"
-          style={{ "--d": "360ms" } as React.CSSProperties}
-        >
-          <div className="overflow-hidden rounded-[var(--radius-lg)] border border-line bg-surface">
-            <div className="flex items-center justify-between border-b border-line px-5 py-3">
-              <span className="u-mono-label">Catalogue index</span>
-              <span className="font-mono text-[0.7rem] text-muted">/ 04</span>
-            </div>
-            <ul>
-              {indexRows.map((row, i) => (
-                <li key={row.href}>
-                  <Link
-                    href={row.href}
-                    className="group flex items-center gap-4 border-b border-line px-5 py-4 transition-colors last:border-b-0 hover:bg-brand-050"
-                  >
-                    <span className="font-mono text-[0.72rem] tracking-[0.12em] text-brand-700">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="font-mono text-[0.72rem] tracking-[0.12em] text-muted">
-                      {row.code}
-                    </span>
-                    <span className="flex-1">
-                      <span className="block font-display text-lg text-ink">
-                        {row.label}
-                      </span>
-                      <span className="block text-sm text-muted">
-                        {row.note}
-                      </span>
-                    </span>
-                    <span
-                      aria-hidden
-                      className="text-brand-700 transition-transform group-hover:translate-x-1"
-                    >
-                      →
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <p className="mt-3 px-1 font-mono text-[0.7rem] leading-relaxed text-muted">
-            The product catalogue is being populated with confirmed data.
-            Request a quote for a specific chemical any time.
-          </p>
+        {/* Slide controls */}
+        <div className="mt-14 flex items-center justify-center gap-3">
+          {slides.map((slide, i) => (
+            <button
+              key={slide.photo.src}
+              type="button"
+              onClick={() => select(i)}
+              aria-label={`Show slide ${i + 1}: ${slide.title}`}
+              aria-current={i === active}
+              className="group p-2"
+            >
+              <span
+                className={
+                  "block h-[3px] w-10 transition-all duration-300 " +
+                  (i === active
+                    ? "bg-white"
+                    : "bg-white/35 group-hover:bg-white/70")
+                }
+              />
+            </button>
+          ))}
         </div>
       </div>
     </section>

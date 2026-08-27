@@ -5,8 +5,12 @@ import { useEffect, useState } from "react";
 import { primaryCta, primaryNav } from "@/config/navigation";
 import { cn } from "@/lib/cn";
 
-/** Off-canvas navigation for small screens. Keyboard- and Escape-friendly. */
-export function MobileNav() {
+/**
+ * Off-canvas navigation for small screens. Keyboard- and Escape-friendly.
+ * `light` renders the trigger for a transparent header sitting over hero
+ * photography; the open panel is always solid paper.
+ */
+export function MobileNav({ light = false }: { light?: boolean }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -28,7 +32,14 @@ export function MobileNav() {
         aria-controls="mobile-nav-panel"
         aria-label={open ? "Close menu" : "Open menu"}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius)] border border-line-strong text-ink"
+        className={cn(
+          "inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-pill)] border transition-colors",
+          // While the panel is open it overlays a paper background, so the
+          // trigger must go dark even when the header itself is transparent.
+          light && !open
+            ? "border-white/50 text-white"
+            : "border-line-strong text-ink",
+        )}
       >
         <span className="relative block h-3.5 w-5">
           <span
@@ -55,7 +66,7 @@ export function MobileNav() {
       {open && (
         <div
           id="mobile-nav-panel"
-          className="fixed inset-0 top-0 z-50 bg-paper"
+          className="fixed inset-0 top-0 z-60 bg-paper"
         >
           <div className="u-container flex h-16 items-center justify-between border-b border-line">
             <span className="u-mono-label">Menu</span>
@@ -63,7 +74,7 @@ export function MobileNav() {
               type="button"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius)] border border-line-strong text-ink"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-pill)] border border-line-strong text-ink"
             >
               <span aria-hidden className="text-xl leading-none">
                 &times;
@@ -87,7 +98,7 @@ export function MobileNav() {
             <Link
               href={primaryCta.href}
               onClick={() => setOpen(false)}
-              className="mt-6 inline-flex h-12 items-center justify-center rounded-[var(--radius)] bg-brand px-6 text-base font-medium text-white"
+              className="mt-6 inline-flex h-12 items-center justify-center rounded-[var(--radius-pill)] bg-brand px-6 text-base font-medium text-white"
             >
               {primaryCta.label}
             </Link>

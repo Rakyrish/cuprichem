@@ -9,6 +9,7 @@
  * facts can be verified.
  */
 
+import { siteConfig } from "@/config/site";
 import type { Article } from "@/types/content";
 
 export const articles: Article[] = [
@@ -65,7 +66,7 @@ export const articles: Article[] = [
       },
       {
         type: "paragraph",
-        text: "Cuprichem handles sourcing through a direct request for quote rather than an online checkout, so every response reflects your specific quantity and requirements.",
+        text: `${siteConfig.name} handles sourcing through a direct request for quote rather than an online checkout, so every response reflects your specific quantity and requirements.`,
       },
     ],
   },

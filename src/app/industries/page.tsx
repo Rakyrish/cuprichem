@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import { getAllIndustries } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { photos } from "@/config/images";
 
 export const metadata: Metadata = buildMetadata({
   title: "Industries we supply",
-  description:
-    "Cuprichem supplies industrial chemicals to manufacturing, water and utilities, institutions and laboratories across Kenya. Explore chemistry by the sector you work in.",
+  description: `${siteConfig.name} supplies industrial chemicals to manufacturing, water and utilities, institutions and laboratories across ${siteConfig.company.address.country}. Explore chemistry by the sector you work in.`,
   path: "/industries",
 });
 
@@ -16,11 +16,12 @@ export default async function IndustriesPage() {
   const industries = await getAllIndustries();
   return (
     <>
-      <Breadcrumbs trail={[{ name: "Industries", path: "/industries" }]} />
       <PageHero
+        trail={[{ name: "Industries", path: "/industries" }]}
+        photo={photos.coatingsStore}
         kicker="Catalogue · Industries"
         title="Chemistry by the sector you work in."
-        intro="Different industries need different chemistry, packaging and support. These are the sectors Cuprichem serves — industry pages expand as products and applications are confirmed."
+        intro={`Different industries need different chemistry, packaging and support. These are the sectors ${siteConfig.name} serves — industry pages expand as products and applications are confirmed.`}
       />
       <section className="u-container py-16">
         <ul className="grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line bg-line sm:grid-cols-3">

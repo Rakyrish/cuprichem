@@ -16,46 +16,73 @@
 */
 
 @theme {
-  /* Brand PRIMARY — CupriChem green (logo). The logo lime (#7CC142) is too
-     light for text/buttons, so `brand` is an accessible deep green used for
-     actions/links/focus, while `brand-bright` is the literal logo lime kept for
-     large decorative accents (rules, the swoosh echo). */
-  --color-brand: #2e7d14; /* primary actions / links / focus (AA on paper & with white) */
-  --color-brand-600: #2a7212;
-  --color-brand-700: #24630f; /* hover / link text */
-  --color-brand-800: #1c4e0c;
-  --color-brand-050: #ecf5e1; /* tint fills */
-  --color-brand-bright: #7cc142; /* logo lime — decorative only, never as text on light */
+  /*
+    The palette is sampled DIRECTLY from the logo artwork
+    (public/brand/cuprichem-logo.png) — the two exact values in that file are:
 
-  /* Secondary — CupriChem blue (logo). */
-  --color-accent: #1470b4; /* secondary accents / rules / secondary buttons */
-  --color-accent-ink: #0f5a93; /* accessible blue text/rule on light */
-  --color-accent-050: #e8f1f9;
-  --color-accent-bright: #4c97d6; /* lighter blue for accents on dark surfaces */
+      green swoosh  #8dc63f
+      blue wordmark #1b75bc
 
-  /* Neutrals */
-  --color-ink: #0e2033; /* text — dark blue-charcoal */
-  --color-ink-strong: #0a1826; /* dark sections / footer */
+    Neither is usable as body/link text on white (1.96:1 and 4.66:1 against
+    paper), so each is kept as a decorative "bright" token and paired with a
+    darkened ramp that clears WCAG AA. Contrast ratios are noted per token so
+    they are not silently broken by a later tweak.
+  */
+
+  /* Brand GREEN — the logo swoosh. `brand` carries actions; `brand-bright`
+     is the literal logo lime, decorative only (rules, numerals, accents on
+     dark), never text on a light background. */
+  --color-brand: #4e7f1d; /* primary actions — white on it 4.80:1 */
+  --color-brand-600: #487519; /* 5.48:1 with white */
+  --color-brand-700: #436d17; /* link + hover text on paper 5.85:1 */
+  --color-brand-800: #365a12;
+  --color-brand-050: #eef6e2; /* tint fills — ink on it 14.9:1 */
+  --color-brand-bright: #8dc63f; /* THE logo lime — 7.21:1 on ink-strong */
+  --color-brand-bright-hover: #7db332; /* hover state for lime-filled buttons */
+
+  /* Brand BLUE — the logo wordmark. */
+  --color-accent: #1b75bc; /* THE logo blue — white on it 4.86:1 */
+  --color-accent-ink: #155e97; /* blue text / rules on paper 6.53:1 */
+  --color-accent-050: #e9f2fa;
+  --color-accent-bright: #6bb0e4; /* accents on dark — 6.28:1 on ink-strong */
+
+  /* Neutrals. The darks are pulled toward the logo blue's hue so the header,
+     dark bands and footer read as one navy family rather than as generic
+     charcoal sitting next to a blue logo. */
+  --color-ink: #0e2033; /* body text — dark blue-charcoal */
+  --color-ink-strong: #092a44; /* dark sections / footer — white 14.7:1 */
+  --color-header: #0b3f68; /* solid header bar — white 10.9:1 */
+  --color-header-strip: #072034; /* utility strip above it — white 16.6:1 */
   --color-paper: #fbfaf7; /* page background — warm neutral white */
   --color-surface: #eff3f7; /* very light cool gray */
   --color-line: #dae2ea; /* hairline borders */
   --color-line-strong: #c3cdd8;
   --color-muted: #566473; /* slate — secondary text */
   --color-on-dark: #eef3f8;
-  --color-muted-on-dark: #93a3b4;
+  --color-muted-on-dark: #a7b6c6; /* 7.12:1 on ink-strong, 5.27:1 on header */
+
+  /* Feedback + third-party brand colours. Declared here rather than inlined at
+     the call site so every colour in the site has exactly one definition. */
+  --color-danger: #b3261e; /* form errors — 6.06:1 on paper */
+  --color-whatsapp: #25d366; /* WhatsApp's own brand green, not ours */
 
   /* Typography — wired to next/font CSS variables in layout.tsx */
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 
-  /* Radii — restrained; the system reads as engineered, not rounded */
+  /* Radii — restrained for panels and photography (square-cornered imagery),
+     with a dedicated pill token used ONLY for buttons and chips. */
   --radius-sm: 3px;
   --radius: 5px;
   --radius-lg: 8px;
+  --radius-pill: 999px;
 
   /* Layout rhythm */
   --spacing-gutter: 1.5rem;
+
+  /* Header height — hero sections offset by this to sit under the bar. */
+  --header-h: 4.5rem;
 }
 
 @layer base {
@@ -138,6 +165,93 @@
   }
 
   /* ---------------------------------------------------------------- */
+  /* Photo-led page furniture.                                         */
+  /* Heroes and feature bands are full-bleed photography with text     */
+  /* laid over it, so these two utilities carry the contrast contract. */
+  /* ---------------------------------------------------------------- */
+
+  /* Scrim over hero photography.
+     Deliberately light — the photograph should read as a photograph, not as a
+     dark texture. Legibility is carried mostly by `.u-photo-text` (a shadow on
+     the type itself), which lets the image stay open while keeping contrast.
+     The ramp is weighted to the bottom third, where the copy actually sits;
+     the middle of the frame is left almost untouched. */
+  .u-photo-scrim {
+    background: linear-gradient(
+      to top,
+      rgba(6, 16, 26, 0.7) 0%,
+      rgba(6, 16, 26, 0.38) 30%,
+      rgba(6, 16, 26, 0.08) 58%,
+      rgba(6, 16, 26, 0) 75%
+    );
+  }
+
+  /* Interior page banners. Copy here is bottom-LEFT rather than centred, so a
+     third gradient weights the left edge: the column the text occupies gets a
+     dependable base while the right two-thirds of the photograph stay open. */
+  .u-photo-scrim-soft {
+    background:
+      linear-gradient(
+        to right,
+        rgba(6, 16, 26, 0.62) 0%,
+        rgba(6, 16, 26, 0.42) 30%,
+        rgba(6, 16, 26, 0.12) 62%,
+        rgba(6, 16, 26, 0) 85%
+      ),
+      linear-gradient(
+        to top,
+        rgba(6, 16, 26, 0.6) 0%,
+        rgba(6, 16, 26, 0.26) 48%,
+        rgba(6, 16, 26, 0.02) 80%
+      );
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Header backgrounds.                                               */
+  /* ---------------------------------------------------------------- */
+
+  /* The bar is opaque at every scroll position. A shallow vertical gradient
+     in the logo-blue family rather than one flat fill — it keeps the bar from
+     reading as a plain coloured block against the page below. */
+  .u-header-solid {
+    background: linear-gradient(180deg, #10507f 0%, #0b3f68 60%, #0a3559 100%);
+  }
+
+  /* A soft pool of shade under the copy block only.
+     Bright photographs (pale drums, lit warehouse floors) can beat a flat
+     scrim wherever the text happens to land. Rather than darkening the whole
+     frame again, this darkens an ellipse centred on the copy — the edges of
+     the photograph stay fully open, and the type sits on a reliable base.
+     `--focus-y` moves the pool for heroes whose copy is not centred. */
+  .u-photo-focus {
+    background: radial-gradient(
+      ellipse 82% 62% at 50% var(--focus-y, 62%),
+      rgba(6, 16, 26, 0.6) 0%,
+      rgba(6, 16, 26, 0.46) 42%,
+      rgba(6, 16, 26, 0.16) 72%,
+      rgba(6, 16, 26, 0) 100%
+    );
+  }
+
+  /* Type laid directly over photography. The shadow does the contrast work
+     the scrim no longer does, so the image underneath can stay clear. */
+  .u-photo-text {
+    text-shadow:
+      0 1px 2px rgba(6, 16, 26, 0.6),
+      0 2px 16px rgba(6, 16, 26, 0.5);
+  }
+
+  /* Generous, consistent vertical rhythm between content sections. */
+  .u-section {
+    padding-block: 5rem;
+  }
+  @media (min-width: 768px) {
+    .u-section {
+      padding-block: 7rem;
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
   /* Motion. Base states are the FINAL (visible) states, so anyone with */
   /* reduced-motion — or JS disabled — sees full content. The hidden    */
   /* start states + animations are added only under no-preference.      */
@@ -184,6 +298,22 @@
       background-size: 200% 200%;
       animation: panGradient 18s ease-in-out infinite alternate;
     }
+
+    /* Slow push-in on hero photography — gives a still image life without
+       the cost or motion-sickness risk of background video. */
+    .photo-drift {
+      animation: photoDrift 22s ease-out both;
+    }
+  }
+
+  /* Kept shallow — a deeper push-in magnifies softness in the source photo. */
+  @keyframes photoDrift {
+    from {
+      transform: scale(1.045);
+    }
+    to {
+      transform: scale(1);
+    }
   }
 
   @keyframes heroRise {
@@ -210,6 +340,48 @@
     }
     to {
       background-position: 100% 50%;
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Floating contact dock.                                            */
+  /* Each button emits an expanding ring so the dock reads as "live"   */
+  /* without moving the button itself (which would make it hard to hit).*/
+  /* ---------------------------------------------------------------- */
+
+  .pulse-ring {
+    position: relative;
+  }
+  .pulse-ring::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background-color: inherit;
+    z-index: -1;
+    /* No animation by default — added only under no-preference below. */
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse-ring::before {
+      animation: pulseRing 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      animation-delay: var(--pulse-delay, 0ms);
+    }
+  }
+
+  @keyframes pulseRing {
+    0% {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    70% {
+      transform: scale(1.85);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1.85);
+      opacity: 0;
     }
   }
 

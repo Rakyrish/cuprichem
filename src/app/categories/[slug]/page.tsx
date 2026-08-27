@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { categories } from "@/data/taxonomy";
 import { getAnyCategoryBySlug, getProductsByCategory } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { rotatePhoto } from "@/config/images";
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/cards/ProductCard";
 
@@ -44,13 +44,20 @@ export default async function CategoryPage({
 
   return (
     <>
-      <Breadcrumbs
+      <PageHero
         trail={[
           { name: "Categories", path: "/categories" },
           { name: category.name, path: `/categories/${category.slug}` },
         ]}
+        // Keyed to taxonomy position so each category keeps a stable, distinct
+        // banner rather than every category page looking identical.
+        photo={rotatePhoto(
+          categories.findIndex((c) => c.slug === category.slug),
+        )}
+        kicker="Category"
+        title={category.name}
+        intro={category.summary}
       />
-      <PageHero kicker="Category" title={category.name} intro={category.summary} />
 
       <section className="u-container py-16">
         {category.intro ? (

@@ -1,0 +1,29 @@
+# Cuprichem backend — runtime dependencies.
+# Pinned to compatible ranges rather than exact versions so security patches
+# are picked up on rebuild; lock exact versions in deployment if required.
+
+Django>=5.1,<6.0
+djangorestframework>=3.15,<4.0
+django-cors-headers>=4.4,<5.0
+django-filter>=24.3
+
+# Auth — JWT in HTTP-only cookies (see apps/accounts/authentication.py).
+PyJWT>=2.9,<3.0
+
+# Database. psycopg is the Postgres driver used in dev/prod; local test runs
+# fall back to SQLite (config/settings/test.py) so the suite needs no server.
+psycopg[binary]>=3.2,<4.0
+
+# Background jobs — AI generation and SEO audits run off the request cycle.
+celery>=5.4,<6.0
+redis>=5.0,<6.0
+
+# AI + media integrations.
+openai>=1.50
+cloudinary>=1.41
+
+# Config
+python-dotenv>=1.0
+
+# WSGI server (production image entrypoint).
+gunicorn>=23.0

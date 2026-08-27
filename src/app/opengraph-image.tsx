@@ -1,13 +1,18 @@
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/config/site";
 
-export const alt = `${siteConfig.legalName} — industrial chemical supplier in Nairobi, Kenya`;
+const { company, brand, og } = siteConfig;
+const place = `${company.address.locality} · ${company.address.country}`;
+const descriptor = siteConfig.legalName.replace(siteConfig.name, "").trim();
+
+export const alt = `${siteConfig.legalName} — ${siteConfig.shortDescription}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /**
  * Default social-share card. Branded, text-based (no external fonts/images) so
- * it renders deterministically at build. Colours match the logo palette.
+ * it renders deterministically at build. Every string and colour comes from the
+ * root `.env` via siteConfig — nothing on this card is written here.
  */
 export default function OgImage() {
   return new ImageResponse(
@@ -19,8 +24,8 @@ export default function OgImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0e2033",
-          color: "#fbfaf7",
+          background: brand.colors.ink,
+          color: brand.colors.paper,
           padding: "72px 80px",
           fontFamily: "sans-serif",
         }}
@@ -31,7 +36,7 @@ export default function OgImage() {
               width: 26,
               height: 26,
               borderRadius: 6,
-              background: "#7cc142",
+              background: brand.colors.accent,
             }}
           />
           <div
@@ -39,15 +44,17 @@ export default function OgImage() {
               fontSize: 30,
               letterSpacing: 4,
               textTransform: "uppercase",
-              color: "#93a3b4",
+              color: brand.colors.muted,
             }}
           >
-            Nairobi · Kenya
+            {place}
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 40, color: "#7cc142" }}>Cuprichem</div>
+          <div style={{ fontSize: 40, color: brand.colors.accent }}>
+            {siteConfig.name}
+          </div>
           <div
             style={{
               fontSize: 68,
@@ -57,12 +64,12 @@ export default function OgImage() {
               maxWidth: 900,
             }}
           >
-            Source industrial chemicals with technical precision.
+            {og.headline}
           </div>
         </div>
 
-        <div style={{ fontSize: 28, color: "#93a3b4" }}>
-          Industrial Chemicals Ltd · Discover → Specify → Source
+        <div style={{ fontSize: 28, color: brand.colors.muted }}>
+          {[descriptor, og.processSteps.join(" → ")].filter(Boolean).join(" · ")}
         </div>
       </div>
     ),

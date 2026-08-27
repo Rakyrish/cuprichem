@@ -8,7 +8,8 @@ import {
   getRelatedProducts,
 } from "@/lib/content";
 import { buildMetadata, productLd } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHero } from "@/components/layout/PageHero";
+import { rotatePhoto } from "@/config/images";
 import { Button } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { PendingNotice } from "@/components/ui/PendingNotice";
@@ -78,7 +79,8 @@ export default async function ProductPage({
         />
       )}
 
-      <Breadcrumbs
+      <PageHero
+        size="compact"
         trail={[
           { name: "Products", path: "/products" },
           ...(category
@@ -86,45 +88,54 @@ export default async function ProductPage({
             : []),
           { name: product.name, path: `/products/${product.slug}` },
         ]}
-      />
-
-      {/* Above the fold */}
-      <section className="u-container grid gap-10 border-b border-line py-12 md:py-16 lg:grid-cols-[1.3fr_1fr]">
-        <div>
+        photo={rotatePhoto(products.findIndex((p) => p.slug === product.slug))}
+        kicker={category ? category.name : "Product"}
+        title={product.name}
+        intro={product.shortDescription}
+      >
+        <div className="flex flex-wrap gap-3">
+          <Button href={rfqHref} size="lg" variant="onPhotoSolid">
+            Request a quote
+            <span aria-hidden>+</span>
+          </Button>
           {category && (
-            <Link
+            <Button
               href={`/categories/${category.slug}`}
-              className="u-mono-label hover:text-brand-700"
+              size="lg"
+              variant="onPhoto"
             >
-              {category.name}
-            </Link>
+              More in {category.name}
+            </Button>
           )}
-          <h1 className="mt-4 text-4xl md:text-5xl">{product.name}</h1>
+        </div>
+      </PageHero>
+
+      {/* Identity / spec panel */}
+      <section className="u-container grid gap-10 border-b border-line py-16 lg:grid-cols-[1.3fr_1fr]">
+        <div>
           {product.synonyms && product.synonyms.length > 0 && (
-            <p className="mt-3 font-mono text-sm text-muted">
-              Also known as: {product.synonyms.join(", ")}
+            <>
+              <h2 className="u-mono-label">Also known as</h2>
+              <p className="mt-3 font-mono text-lg text-ink">
+                {product.synonyms.join(", ")}
+              </p>
+            </>
+          )}
+          {category && (
+            <p className="mt-8 text-muted">
+              Part of{" "}
+              <Link
+                href={`/categories/${category.slug}`}
+                className="text-brand-700 underline underline-offset-4"
+              >
+                {category.name}
+              </Link>
+              . Tell us the grade, quantity and packaging you need and our sales
+              team will confirm availability and lead time.
             </p>
           )}
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">
-            {product.shortDescription}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button href={rfqHref} size="lg">
-              Request a quote
-            </Button>
-            {category && (
-              <Button
-                href={`/categories/${category.slug}`}
-                size="lg"
-                variant="outline"
-              >
-                More in {category.name}
-              </Button>
-            )}
-          </div>
         </div>
 
-        {/* Identity / spec panel */}
         <aside className="h-fit rounded-[var(--radius-lg)] border border-line bg-surface p-6">
           <h2 className="u-mono-label">Product identity</h2>
           {techEntries.length > 0 ? (
@@ -208,8 +219,9 @@ export default async function ProductPage({
             team will respond with availability, pricing and lead time.
           </p>
           <div className="mt-6">
-            <Button href={rfqHref} size="lg" variant="accent">
+            <Button href={rfqHref} size="lg" variant="lime">
               Request a quote
+              <span aria-hidden>+</span>
             </Button>
           </div>
         </div>

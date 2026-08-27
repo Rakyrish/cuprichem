@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { articles } from "@/data/articles";
 import { getArticleBySlug, getAnyCategoryBySlug } from "@/lib/content";
 import { articleLd, buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHero } from "@/components/layout/PageHero";
+import { rotatePhoto } from "@/config/images";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Button } from "@/components/ui/Button";
 import type { Category } from "@/types/content";
@@ -57,32 +58,25 @@ export default async function ArticlePage({
           dateModified: article.dateModified,
         })}
       />
-      <Breadcrumbs
+      <PageHero
+        size="compact"
         trail={[
           { name: "Resources", path: "/resources" },
           { name: article.title, path: `/resources/${article.slug}` },
         ]}
+        photo={rotatePhoto(
+          articles.findIndex((a) => a.slug === article.slug),
+        )}
+        kicker={`Resource · ${new Date(article.datePublished).toLocaleDateString(
+          "en-GB",
+          { year: "numeric", month: "long", day: "numeric" },
+        )}`}
+        title={article.title}
+        intro={article.summary}
       />
 
-      <article className="u-container py-12 md:py-16">
-        <header className="max-w-3xl border-b border-line pb-8">
-          <p className="u-mono-label">
-            Resource ·{" "}
-            <time dateTime={article.datePublished}>
-              {new Date(article.datePublished).toLocaleDateString("en-GB", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
-          </p>
-          <h1 className="mt-5 text-4xl md:text-5xl">{article.title}</h1>
-          <p className="mt-5 text-lg leading-relaxed text-muted">
-            {article.summary}
-          </p>
-        </header>
-
-        <div className="mt-10 max-w-2xl">
+      <article className="u-container py-16">
+        <div className="max-w-2xl">
           {article.body.map((block, i) => {
             if (block.type === "heading") {
               return (

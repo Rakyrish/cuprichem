@@ -148,7 +148,7 @@ export function RequestQuoteForm({ defaultProduct = "" }: { defaultProduct?: str
       </div>
 
       {errors.form && (
-        <p role="alert" className="text-sm text-[#b3261e]">
+        <p role="alert" className="text-sm text-danger">
           {errors.form}
         </p>
       )}
@@ -171,7 +171,7 @@ export function RequestQuoteForm({ defaultProduct = "" }: { defaultProduct?: str
 
 function FieldError({ children }: { children: React.ReactNode }) {
   return (
-    <p role="alert" className="mt-1.5 text-sm text-[#b3261e]">
+    <p role="alert" className="mt-1.5 text-sm text-danger">
       {children}
     </p>
   );

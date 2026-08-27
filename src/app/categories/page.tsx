@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import { getAllCategories } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { photos } from "@/config/images";
 
 export const metadata: Metadata = buildMetadata({
   title: "Chemical categories",
-  description:
-    "Browse Cuprichem's industrial chemicals by category — water treatment, industrial cleaning, laboratory reagents and construction chemistry — supplied across Kenya.",
+  description: `Browse ${siteConfig.name}'s industrial chemicals by category — water treatment, industrial cleaning, laboratory reagents and construction chemistry — supplied across ${siteConfig.company.address.country}.`,
   path: "/categories",
 });
 
@@ -16,11 +16,12 @@ export default async function CategoriesPage() {
   const categories = await getAllCategories();
   return (
     <>
-      <Breadcrumbs trail={[{ name: "Categories", path: "/categories" }]} />
       <PageHero
+        trail={[{ name: "Categories", path: "/categories" }]}
+        photo={photos.coatingsAisle}
         kicker="Catalogue · Categories"
         title="Chemicals by category."
-        intro="Cuprichem's catalogue is organised by the type of chemistry you are sourcing. Category pages are being populated with confirmed products — request a quote for anything within an area today."
+        intro={`${siteConfig.name}'s catalogue is organised by the type of chemistry you are sourcing. Category pages are being populated with confirmed products — request a quote for anything within an area today.`}
       />
       <section className="u-container py-16">
         <ul className="grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line bg-line sm:grid-cols-2">

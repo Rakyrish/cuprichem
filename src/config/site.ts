@@ -1,71 +1,137 @@
 /**
- * Site-wide configuration — the ONLY place company/contact/brand facts live.
+ * Site-wide configuration.
  *
- * Every value in `company` is taken verbatim from the client-supplied Cuprichem
- * documentation (letterhead + KRA registration). Nothing here is invented. Where
- * a fact was NOT supplied (e.g. opening hours, social handles, service area) it
- * is deliberately absent rather than guessed — see docs/pending-cuprichem-data.md.
+ * Nothing here is a literal. Every value is read from the single repository
+ * root `.env` (see `.env.example`) and surfaced to the browser by the `env`
+ * block in `next.config.ts`. Changing a company fact, an origin or a brand
+ * asset is an `.env` edit, never a code edit.
  *
- * Environment-specific values read from process.env so no deployment detail is
- * baked into source.
+ * `process.env.X` is written out longhand on purpose: Next inlines only
+ * statically analysable member expressions, so `process.env[name]` would
+ * resolve to `undefined` in the browser bundle.
  */
 
-const rawSiteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://www.cuprichem.co.ke";
+/** Fail loudly at build time rather than shipping a page with a blank field. */
+function required(name: string, value: string | undefined): string {
+  if (value === undefined || value.trim() === "") {
+    throw new Error(
+      `Missing required environment variable ${name}. ` +
+        `Copy .env.example to .env at the repository root and fill it in.`,
+    );
+  }
+  return value.trim();
+}
+
+function optional(value: string | undefined, fallback = ""): string {
+  return value?.trim() || fallback;
+}
+
+function integer(name: string, value: string | undefined): number {
+  const parsed = Number.parseInt(required(name, value), 10);
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`Environment variable ${name} must be an integer.`);
+  }
+  return parsed;
+}
+
+/** "a,b, c" -> ["a", "b", "c"] */
+function list(value: string | undefined): string[] {
+  return optional(value)
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+/**
+ * COMPANY_PHONES is a comma-separated list of `display|E.164` pairs, so the
+ * printed form and the dialled form stay together and cannot drift apart.
+ */
+function phones(name: string, value: string | undefined): { display: string; href: string }[] {
+  const parsed = list(value).map((entry) => {
+    const [display, e164] = entry.split("|").map((part) => part.trim());
+    if (!display || !e164) {
+      throw new Error(
+        `Environment variable ${name} entry "${entry}" must be "display|+E164".`,
+      );
+    }
+    return { display, href: `tel:${e164}` };
+  });
+  if (parsed.length === 0) {
+    throw new Error(`Environment variable ${name} must list at least one number.`);
+  }
+  return parsed;
+}
+
+const url = required("SITE_URL", process.env.SITE_URL).replace(/\/$/, "");
+
+const companyPhones = phones("COMPANY_PHONES", process.env.COMPANY_PHONES);
+const email = required("COMPANY_EMAIL", process.env.COMPANY_EMAIL);
+const salesEmail = required("COMPANY_SALES_EMAIL", process.env.COMPANY_SALES_EMAIL);
+const whatsapp = required("COMPANY_WHATSAPP", process.env.COMPANY_WHATSAPP);
 
 export const siteConfig = {
-  name: "Cuprichem",
-  legalName: "Cuprichem Industrial Chemicals Ltd",
-  /** Working strapline for the platform concept — not a supplied tagline. */
-  tagline: "Industrial chemicals, specified and sourced.",
-  shortDescription:
-    "Cuprichem Industrial Chemicals Ltd is a Nairobi-based supplier of industrial chemicals, serving manufacturers, institutions and technical buyers across Kenya.",
-  url: rawSiteUrl,
-  locale: "en_KE",
-  language: "en",
+  name: required("SITE_NAME", process.env.SITE_NAME),
+  legalName: required("SITE_LEGAL_NAME", process.env.SITE_LEGAL_NAME),
+  tagline: required("SITE_TAGLINE", process.env.SITE_TAGLINE),
+  shortDescription: required("SITE_DESCRIPTION", process.env.SITE_DESCRIPTION),
+  url,
+  locale: required("SITE_LOCALE", process.env.SITE_LOCALE),
+  language: required("SITE_LANGUAGE", process.env.SITE_LANGUAGE),
 
-  // --- Verified company facts (client documentation) ---
+  /** Copy used only by the generated Open Graph card. */
+  og: {
+    headline: required("SITE_OG_HEADLINE", process.env.SITE_OG_HEADLINE),
+    processSteps: list(process.env.SITE_PROCESS_STEPS),
+  },
+
   company: {
-    director: "Cendric Wasua",
-    kraPin: "P052472985Q",
-    email: "cuprichemindustrialchemicals@gmail.com",
-    salesEmail: "salescuprichemindustrialchemic@gmail.com",
-    phones: [
-      { display: "0721 856 061", href: "tel:+254721856061" },
-      { display: "0111 314 860", href: "tel:+254111314860" },
-      { display: "0736 672 323", href: "tel:+254736672323" },
-    ],
+    email,
+    salesEmail,
+    phones: companyPhones,
     address: {
-      building: "Repen/Repem Complex Bld, 2nd Floor",
-      street: "Katani Road",
-      locality: "Syokimau",
-      region: "Nairobi",
-      country: "Kenya",
-      countryCode: "KE",
-      poBox: "P.O. Box 18648-00100, Nairobi",
+      building: required("COMPANY_ADDRESS_BUILDING", process.env.COMPANY_ADDRESS_BUILDING),
+      street: required("COMPANY_ADDRESS_STREET", process.env.COMPANY_ADDRESS_STREET),
+      locality: required("COMPANY_ADDRESS_LOCALITY", process.env.COMPANY_ADDRESS_LOCALITY),
+      region: required("COMPANY_ADDRESS_REGION", process.env.COMPANY_ADDRESS_REGION),
+      country: required("COMPANY_ADDRESS_COUNTRY", process.env.COMPANY_ADDRESS_COUNTRY),
+      countryCode: required(
+        "COMPANY_ADDRESS_COUNTRY_CODE",
+        process.env.COMPANY_ADDRESS_COUNTRY_CODE,
+      ),
+      poBox: required("COMPANY_POSTAL_ADDRESS", process.env.COMPANY_POSTAL_ADDRESS),
     },
   },
 
   contact: {
-    // Primary display phone (first listed on the letterhead).
-    phoneDisplay: "0721 856 061",
-    phoneHref: "tel:+254721856061",
-    email: "cuprichemindustrialchemicals@gmail.com",
-    emailHref: "mailto:cuprichemindustrialchemicals@gmail.com",
-    salesEmailHref: "mailto:salescuprichemindustrialchemic@gmail.com",
-    whatsappHref: "https://wa.me/254721856061",
+    /** Primary display phone — the first entry in COMPANY_PHONES. */
+    phoneDisplay: companyPhones[0].display,
+    phoneHref: companyPhones[0].href,
+    email,
+    emailHref: `mailto:${email}`,
+    salesEmailHref: `mailto:${salesEmail}`,
+    whatsappHref: `https://wa.me/${whatsapp}`,
   },
 
   brand: {
-    logo: "/brand/cuprichem-logo.png",
-    logoWidth: 247,
-    logoHeight: 140,
+    logo: required("BRAND_LOGO_PATH", process.env.BRAND_LOGO_PATH),
+    logoWidth: integer("BRAND_LOGO_WIDTH", process.env.BRAND_LOGO_WIDTH),
+    logoHeight: integer("BRAND_LOGO_HEIGHT", process.env.BRAND_LOGO_HEIGHT),
+    icon: required("BRAND_ICON_PATH", process.env.BRAND_ICON_PATH),
+    appleIcon: required("BRAND_APPLE_ICON_PATH", process.env.BRAND_APPLE_ICON_PATH),
+    colors: {
+      header: required("BRAND_COLOR_HEADER", process.env.BRAND_COLOR_HEADER),
+      ink: required("BRAND_COLOR_INK", process.env.BRAND_COLOR_INK),
+      paper: required("BRAND_COLOR_PAPER", process.env.BRAND_COLOR_PAPER),
+      accent: required("BRAND_COLOR_ACCENT", process.env.BRAND_COLOR_ACCENT),
+      muted: required("BRAND_COLOR_MUTED", process.env.BRAND_COLOR_MUTED),
+    },
   },
 
   api: {
-    // Phase 2: the Django REST API base URL. Empty => read from local files.
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
+    /** Django REST API base URL. Empty => catalogue is read from local files. */
+    baseUrl: optional(process.env.API_BASE_URL).replace(/\/$/, ""),
+    /** Remote image host allowed by next/image and the CSP. Blank => none. */
+    mediaCdnOrigin: optional(process.env.MEDIA_CDN_ORIGIN).replace(/\/$/, ""),
   },
 } as const;
 

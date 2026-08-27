@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { siteConfig } from "@/config/site";
 
 /**
  * Security headers applied to document responses.
@@ -13,11 +14,27 @@ import { NextResponse } from "next/server";
  *    bootstrap/RSC scripts and next/font's inline styles. The high-value
  *    protection — blocking injected EXTERNAL scripts/objects/frames and locking
  *    base-uri/form-action — is fully enforced.
+ *  - The external origins allowed below are NOT written here: they come from
+ *    `MEDIA_CDN_ORIGIN` / `API_BASE_URL` in the root `.env`, so the policy and
+ *    the origins the app actually uses cannot drift apart.
  *  - To move to a strict nonce-based `script-src` later, generate a nonce here,
  *    pass it via an `x-nonce` request header, read it in the JsonLd component,
  *    and drop `'unsafe-inline'`. That makes rendering dynamic (nonce is
  *    per-request), which is why it is not the default for this content site.
  */
+
+/** Same-origin API calls need no entry; a cross-origin API must be named. */
+function crossOrigin(value: string): string[] {
+  if (!value) return [];
+  try {
+    return [new URL(value).origin];
+  } catch {
+    return [];
+  }
+}
+
+const IMG_SRC = ["'self'", "data:", ...crossOrigin(siteConfig.api.mediaCdnOrigin)];
+const CONNECT_SRC = ["'self'", ...crossOrigin(siteConfig.api.baseUrl)];
 
 const CSP = [
   "default-src 'self'",
@@ -25,11 +42,11 @@ const CSP = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self' mailto:",
-  "img-src 'self' data: https://res.cloudinary.com",
+  `img-src ${IMG_SRC.join(" ")}`,
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "script-src 'self' 'unsafe-inline'",
-  "connect-src 'self'",
+  `connect-src ${CONNECT_SRC.join(" ")}`,
   "manifest-src 'self'",
   "frame-src 'none'",
   "upgrade-insecure-requests",
