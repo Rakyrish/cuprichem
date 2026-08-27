@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import { getAllCategories, getAllProducts } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { photos } from "@/config/images";
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/cards/ProductCard";
 
 export const metadata: Metadata = buildMetadata({
   title: "Industrial chemical products",
-  description:
-    "Browse Cuprichem's industrial chemical catalogue by category — request a quote for the chemistry, grade and quantity you need, supplied across Kenya.",
+  description: `Browse ${siteConfig.name}'s industrial chemical catalogue by category — request a quote for the chemistry, grade and quantity you need, supplied across ${siteConfig.company.address.country}.`,
   path: "/products",
 });
 
@@ -29,10 +29,11 @@ export default async function ProductsPage() {
 
   return (
     <>
-      <Breadcrumbs trail={[{ name: "Products", path: "/products" }]} />
       <PageHero
+        trail={[{ name: "Products", path: "/products" }]}
+        photo={photos.drumsStacked}
         kicker="Catalogue · Products"
-        title="The Cuprichem chemical catalogue."
+        title={`The ${siteConfig.name} chemical catalogue.`}
         intro="Browse the chemistry we supply, grouped by category. Confirmed grades, specifications and packaging are being added — request a quote for exact details and availability on any product."
       >
         <div className="flex flex-wrap gap-3">

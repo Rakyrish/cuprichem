@@ -1,13 +1,14 @@
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.*
 
 # testing
 /coverage
+.pytest_cache/
 
-# next.js
-/.next/
+# next.js — root app and admin app
+.next/
 /out/
 
 # production
@@ -22,7 +23,10 @@ npm-debug.log*
 yarn-debug.log*
 .pnpm-debug.log*
 
-# env files (opt-in for committing only .env.example)
+# env files
+#
+# There is exactly ONE environment file in this repository: /.env at the root.
+# It is never committed; only .env.example is tracked.
 .env*
 !.env.example
 
@@ -32,6 +36,14 @@ yarn-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python / django
+.venv/
+__pycache__/
+*.py[cod]
+/backend/staticfiles/
+/backend/mediafiles/
+*.sqlite3
 
 # original supplied assets kept out of the tracked tree
 /Screenshot*.png

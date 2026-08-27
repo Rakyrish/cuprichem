@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { photos } from "@/config/images";
 import { RequestQuoteForm } from "@/components/forms/RequestQuoteForm";
 
 export const metadata: Metadata = buildMetadata({
   title: "Request a quote for industrial chemicals",
-  description:
-    "Request a quote from Cuprichem Industrial Chemicals Ltd. Send the chemical, grade and quantity you need and our Nairobi sales team responds with availability, pricing and lead time.",
+  description: `Request a quote from ${siteConfig.legalName}. Send the chemical, grade and quantity you need and our ${siteConfig.company.address.region} sales team responds with availability, pricing and lead time.`,
   path: "/request-a-quote",
 });
 
@@ -22,8 +21,9 @@ export default async function RequestQuotePage({
   const defaultProduct = typeof product === "string" ? product.slice(0, 150) : "";
   return (
     <>
-      <Breadcrumbs trail={[{ name: "Request a quote", path: "/request-a-quote" }]} />
       <PageHero
+        trail={[{ name: "Request a quote", path: "/request-a-quote" }]}
+        photo={photos.drumsStacked}
         kicker="Request for quote"
         title="Request a quote."
         intro="Tell us what you need and our sales team will respond with availability, pricing and lead time. No account or checkout required."

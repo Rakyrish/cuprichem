@@ -84,7 +84,6 @@ export function organizationLd() {
       addressRegion: company.address.region,
       addressCountry: company.address.countryCode,
     },
-    founder: { "@type": "Person", name: company.director },
   };
 }
 

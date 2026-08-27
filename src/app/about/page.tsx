@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { photos } from "@/config/images";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = buildMetadata({
-  title: "About Cuprichem Industrial Chemicals",
-  description:
-    "Cuprichem Industrial Chemicals Ltd is a registered industrial-chemical supplier based in Syokimau, Nairobi, serving manufacturers, institutions and laboratories across Kenya.",
+  title: `About ${siteConfig.legalName}`,
+  description: `${siteConfig.legalName} is a registered industrial-chemical supplier based in ${siteConfig.company.address.locality}, ${siteConfig.company.address.region}, serving manufacturers, institutions and laboratories across ${siteConfig.company.address.country}.`,
   path: "/about",
 });
 
@@ -16,10 +15,11 @@ export default function AboutPage() {
   const { company, legalName } = siteConfig;
   return (
     <>
-      <Breadcrumbs trail={[{ name: "About", path: "/about" }]} />
       <PageHero
+        trail={[{ name: "About", path: "/about" }]}
+        photo={photos.drumStoreWide}
         kicker="About the company"
-        title="A Nairobi-based industrial chemical supplier."
+        title={`A ${company.address.region}-based industrial chemical supplier.`}
         intro={`${legalName} supplies industrial chemicals to manufacturers, institutions and laboratories across Kenya, with a focus on getting buyers the right chemistry, grade and packaging for their process.`}
       />
 
@@ -27,7 +27,7 @@ export default function AboutPage() {
         <div className="max-w-2xl">
           <h2 className="text-2xl">What we do</h2>
           <p className="mt-4 leading-relaxed text-muted">
-            Cuprichem sources and supplies industrial chemicals for a range of
+            {siteConfig.name} sources and supplies industrial chemicals for a range of
             technical and industrial uses. Our approach is built around clear
             product information and a direct request-for-quote process, so
             procurement teams can specify exactly what they need and receive
@@ -69,18 +69,6 @@ export default function AboutPage() {
                 Registered name
               </dt>
               <dd className="mt-1 text-ink">{legalName}</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
-                Director
-              </dt>
-              <dd className="mt-1 text-ink">{company.director}</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
-                KRA PIN
-              </dt>
-              <dd className="mt-1 font-mono text-ink">{company.kraPin}</dd>
             </div>
             <div>
               <dt className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">

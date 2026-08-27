@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Testing. OpenAI is always mocked in tests (see apps/ai/tests/) — the suite
+# never makes a real API call.
+pytest>=8.3
+pytest-django>=4.9
+pytest-cov>=5.0

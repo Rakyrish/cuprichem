@@ -17,17 +17,22 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# NEXT_PUBLIC_* are inlined at build time — pass the real origin at build.
-ARG NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
-RUN npm run build
+# The browser-visible values in .env are inlined at build time, so the build
+# needs the real file. It is mounted as a BuildKit secret rather than COPYd so
+# it never becomes part of any image layer:
+#
+#   docker build --secret id=dotenv,src=.env .
+RUN --mount=type=secret,id=dotenv,target=/app/.env,required=true npm run build
 
 # --- runner: minimal production image ----------------------------------------
 FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
+# The port the standalone server binds. docker-compose overrides it with
+# WEB_PORT from the root .env; the ARG only keeps a plain `docker run` working.
+ARG WEB_PORT=3000
+ENV PORT=${WEB_PORT}
 ENV HOSTNAME=0.0.0.0
 
 # Run as an unprivileged user.
@@ -40,5 +45,5 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
-EXPOSE 3000
+EXPOSE ${WEB_PORT}
 CMD ["node", "server.js"]

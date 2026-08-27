@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import { Hero } from "@/components/sections/Hero";
 import { CategoryAreas } from "@/components/sections/CategoryAreas";
 import { SourcingProcess } from "@/components/sections/SourcingProcess";
@@ -9,9 +10,8 @@ import { QuoteCta } from "@/components/sections/QuoteCta";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Industrial chemical supplier in Nairobi, Kenya",
-  description:
-    "Cuprichem Industrial Chemicals Ltd supplies industrial chemicals to manufacturers, institutions and laboratories across Kenya. Discover, specify and source with a direct request for quote.",
+  title: `Industrial chemical supplier in ${siteConfig.company.address.region}, ${siteConfig.company.address.country}`,
+  description: `${siteConfig.legalName} supplies industrial chemicals to manufacturers, institutions and laboratories across Kenya. Discover, specify and source with a direct request for quote.`,
   path: "/",
 });
 

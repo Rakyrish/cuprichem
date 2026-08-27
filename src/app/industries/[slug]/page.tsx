@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { industries } from "@/data/taxonomy";
 import { getAnyIndustryBySlug } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { rotatePhoto } from "@/config/images";
 import { Button } from "@/components/ui/Button";
 
 export function generateStaticParams() {
@@ -38,13 +38,20 @@ export default async function IndustryPage({
 
   return (
     <>
-      <Breadcrumbs
+      <PageHero
         trail={[
           { name: "Industries", path: "/industries" },
           { name: industry.name, path: `/industries/${industry.slug}` },
         ]}
+        // Offset by one so an industry page and the category page at the same
+        // taxonomy position don't land on the same photograph.
+        photo={rotatePhoto(
+          industries.findIndex((i) => i.slug === industry.slug) + 1,
+        )}
+        kicker="Industry"
+        title={industry.name}
+        intro={industry.summary}
       />
-      <PageHero kicker="Industry" title={industry.name} intro={industry.summary} />
 
       <section className="u-container py-16">
         <div className="max-w-2xl">

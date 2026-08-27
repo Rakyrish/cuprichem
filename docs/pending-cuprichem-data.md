@@ -10,14 +10,19 @@ of the sitemap until confirmed.
 These are already wired into `src/config/site.ts` and rendered site-wide:
 
 - Registered name: **Cuprichem Industrial Chemicals Ltd**
-- Director: **Cendric Wasua**
-- KRA PIN: **P052472985Q**
 - Registered address: Repen/Repem Complex Bld, 2nd Floor, Katani Road,
   Syokimau, Nairobi; P.O. Box 18648-00100, Nairobi
 - Phones: 0721 856 061 · 0111 314 860 · 0736 672 323
 - Emails: cuprichemindustrialchemicals@gmail.com (general),
   salescuprichemindustrialchemic@gmail.com (sales)
 - Logo artwork: supplied PNG → processed into `/public/brand/` and the favicon.
+
+> **Deliberately withheld from the public site.** The KRA PIN and the named
+> director were supplied on the letterhead but are NOT published anywhere on
+> the site, and are not stored in this repo. A tax identifier and a private
+> individual's name are sensitive, and neither helps a buyer source a chemical.
+> Keep them in the client's own records. Do not re-add them to
+> `src/config/site.ts`, the footer, the About page or the structured data.
 
 ## Required before launch (NOT yet supplied — do not invent)
 

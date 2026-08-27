@@ -10,7 +10,9 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-24 bg-ink-strong text-on-dark">
+    <footer className="relative bg-ink-strong text-on-dark">
+      {/* Lime hairline echoing the logo swoosh, capping the dark block. */}
+      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-brand-bright" />
       <div className="u-container grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr] md:gap-8">
         {/* Brand + address */}
         <div>
@@ -70,7 +72,7 @@ export function Footer() {
             © {year} {legalName}. All rights reserved.
           </p>
           <p className="font-mono text-[0.72rem] uppercase tracking-[0.12em]">
-            KRA PIN {company.kraPin} · Director {company.director}
+            {address.locality} · {address.region} · {address.country}
           </p>
         </div>
       </div>

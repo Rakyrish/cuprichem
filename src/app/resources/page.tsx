@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import { getPublishedArticles } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { photos } from "@/config/images";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = buildMetadata({
   title: "Resources & technical notes",
-  description:
-    "Guides, procurement notes and technical information from Cuprichem Industrial Chemicals — practical references for buyers and technical staff in Kenya.",
+  description: `Guides, procurement notes and technical information from ${siteConfig.legalName} — practical references for buyers and technical staff in ${siteConfig.company.address.country}.`,
   path: "/resources",
 });
 
@@ -17,8 +17,9 @@ export default async function ResourcesPage() {
   const articles = await getPublishedArticles();
   return (
     <>
-      <Breadcrumbs trail={[{ name: "Resources", path: "/resources" }]} />
       <PageHero
+        trail={[{ name: "Resources", path: "/resources" }]}
+        photo={photos.coatingsStore}
         kicker="Resources"
         title="Practical references for buyers and technical staff."
         intro="Guides and procurement notes to help you specify, source and handle industrial chemicals. We add resources only where they provide genuine, verifiable value."

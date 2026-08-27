@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHero } from "@/components/layout/PageHero";
+import { photos } from "@/config/images";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Contact Cuprichem — Syokimau, Nairobi",
-  description:
-    "Contact Cuprichem Industrial Chemicals Ltd in Syokimau, Nairobi. Phone, email and registered address for sales enquiries and industrial chemical supply across Kenya.",
+  title: `Contact ${siteConfig.name} — ${siteConfig.company.address.locality}, ${siteConfig.company.address.region}`,
+  description: `Contact ${siteConfig.legalName} in ${siteConfig.company.address.locality}, ${siteConfig.company.address.region}. Phone, email and registered address for sales enquiries and industrial chemical supply across ${siteConfig.company.address.country}.`,
   path: "/contact",
 });
 
@@ -16,11 +15,12 @@ export default function ContactPage() {
   const { company, contact } = siteConfig;
   return (
     <>
-      <Breadcrumbs trail={[{ name: "Contact", path: "/contact" }]} />
       <PageHero
+        trail={[{ name: "Contact", path: "/contact" }]}
+        photo={photos.coatingsAisle}
         kicker="Contact"
         title="Talk to our sales team."
-        intro="Reach us by phone or email, or send a request for quote with your requirement. We are based in Syokimau, Nairobi."
+        intro={`Reach us by phone or email, or send a request for quote with your requirement. We are based in ${company.address.locality}, ${company.address.region}.`}
       />
 
       <section className="u-container grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line bg-line md:grid-cols-3 my-16">

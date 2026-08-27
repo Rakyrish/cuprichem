@@ -6,6 +6,8 @@
  * "/products" does not assert any specific product exists yet.
  */
 
+import { siteConfig } from "@/config/site";
+
 export type NavLink = { label: string; href: string; description?: string };
 
 export const primaryNav: NavLink[] = [
@@ -13,7 +15,7 @@ export const primaryNav: NavLink[] = [
   { label: "Categories", href: "/categories", description: "Chemicals grouped by type" },
   { label: "Industries", href: "/industries", description: "Solutions by sector" },
   { label: "Resources", href: "/resources", description: "Guides and technical notes" },
-  { label: "About", href: "/about", description: "The company behind Cuprichem" },
+  { label: "About", href: "/about", description: `The company behind ${siteConfig.name}` },
   { label: "Contact", href: "/contact", description: "Talk to our sales team" },
 ];
 
@@ -30,7 +32,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
   {
     title: "Company",
     links: [
-      { label: "About Cuprichem", href: "/about" },
+      { label: `About ${siteConfig.name}`, href: "/about" },
       { label: "Resources", href: "/resources" },
       { label: "Contact", href: "/contact" },
       { label: "Request a quote", href: "/request-a-quote" },
