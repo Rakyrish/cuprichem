@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(docker --version)",
+      "Bash(python3 *)",
+      "Bash(npm install *)",
+      "Bash(npx -y npm@10.9.2 install)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(node_modules/.bin/eslint .)",
+      "Bash(node_modules/.bin/next build *)",
+      "Bash(PORT=3111 node_modules/.bin/next start -p 3111)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(awk '{print $2, $11, $12, $13}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" --max-time 3 http://localhost:3117/)",
+      "Bash(command -v chromium chromium-browser google-chrome google-chrome-stable)",
+      "Bash(pkill -9 -f \"next-server\")",
+      "Bash(pkill -9 -f \"next start\")",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(pkill -9 -f \"standalone-test/server.js\")",
+      "Bash(pkill -9 -f \"standalone-test\")",
+      "Bash(exit 0)",
+      "mcp__claude_ai_Higgsfield__generate_image_batch",
+      "Bash(find . -type f '\\(' -iname *.csv -o -iname *.xlsx -o -iname *.xls -o -iname *.pdf -o -iname *.docx -o -iname *.doc -o -iname *.txt -o -iname *.json -o -iname *.tsv -o -iname *.ods '\\)' -not -path ./node_modules/* -not -path ./.next/* -not -path ./.git/*)",
+      "Read(//home/karivex/Downloads/**)"
+    ]
+  }
+}

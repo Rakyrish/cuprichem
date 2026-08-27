@@ -1,0 +1,40 @@
+# Production stack: Next.js standalone app behind Caddy (auto-HTTPS + headers).
+#
+#   SITE_ADDRESS=cuprichem.co.ke \
+#   NEXT_PUBLIC_SITE_URL=https://cuprichem.co.ke \
+#   docker compose up -d --build
+#
+# Caddy needs ports 80/443 to obtain certificates.
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        # NEXT_PUBLIC_* are build-time inlined; pass the real origin here.
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://www.cuprichem.co.ke}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    expose:
+      - "3000"
+    # No published ports — only Caddy talks to it.
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-cuprichem.co.ke}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

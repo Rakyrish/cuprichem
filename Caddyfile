@@ -1,0 +1,30 @@
+# Caddy reverse proxy for Cuprichem — automatic HTTPS + edge security headers.
+#
+# Caddy obtains and renews TLS certificates automatically. Security headers are
+# set here at the edge as the authoritative layer (defense-in-depth with the
+# app's own middleware). Replace the site address with the real domain.
+
+{$SITE_ADDRESS:cuprichem.co.ke} {
+	encode zstd gzip
+
+	# Canonical host redirect (www -> apex or vice-versa) is configured once the
+	# final canonical host is confirmed; keep it consistent with NEXT_PUBLIC_SITE_URL.
+
+	header {
+		# HSTS — two years, subdomains, preload-eligible.
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+		# Content Security Policy (mirrors src/middleware.ts). See that file for the
+		# rationale; keep the two in sync.
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self' mailto:; img-src 'self' data: https://res.cloudinary.com; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; manifest-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		X-DNS-Prefetch-Control "off"
+		# Do not leak the upstream server identity.
+		-Server
+	}
+
+	reverse_proxy web:3000
+}

@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.github
+npm-debug.log*
+Dockerfile
+.dockerignore
+docker-compose.yml
+Caddyfile
+README.md
+docs
+.env*
+!.env.example
+*.tsbuildinfo
+Screenshot*.png
+coverage
